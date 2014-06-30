@@ -54,12 +54,18 @@ public class MultipartBody extends BaseRequest implements Body {
 		this.httpRequestObj = httpRequest;
 	}
 	
-	public MultipartBody field(String name, String value) {
-		parameters.put(name, value);
+	public MultipartBody field(String name, Object value) {
+        if(null == value)
+            return this;
+
+		parameters.put(name, value.toString());
 		return this;
 	}
 	
 	public MultipartBody field(String name, File file) {
+        if(null == file)
+            return this;
+
 		this.parameters.put(name, file);
 		hasFile = true;
 		return this;
@@ -74,11 +80,16 @@ public class MultipartBody extends BaseRequest implements Body {
 		if (hasFile) {
 			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 			for(Entry<String, Object> part : parameters.entrySet()) {
-				if (part.getValue() instanceof File) {
+
+                Object value = part.getValue();
+                if(null == value)
+                    continue;
+
+                if (value instanceof File) {
 					hasFile = true;
-					builder.addPart(part.getKey(), new FileBody((File) part.getValue()));
+					builder.addPart(part.getKey(), new FileBody((File) value));
 				} else {
-					builder.addPart(part.getKey(), new StringBody(part.getValue().toString(), ContentType.APPLICATION_FORM_URLENCODED));
+					builder.addPart(part.getKey(), new StringBody(value.toString(), ContentType.APPLICATION_FORM_URLENCODED));
 				}
 			}
 			return builder.build();

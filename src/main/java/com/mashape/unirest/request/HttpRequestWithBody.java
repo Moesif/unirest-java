@@ -41,12 +41,12 @@ public class HttpRequestWithBody extends HttpRequest {
 	}
 
 	@Override
-	public HttpRequestWithBody header(String name, String value) {
+	public HttpRequestWithBody header(String name, Object value) {
 		return (HttpRequestWithBody) super.header(name, value);
 	}
 	
 	@Override
-	public HttpRequestWithBody headers(Map<String, String> headers) {
+	public HttpRequestWithBody headers(Map<String, Object> headers) {
 		return (HttpRequestWithBody) super.headers(headers);
 	}
 	
@@ -56,13 +56,21 @@ public class HttpRequestWithBody extends HttpRequest {
 	}
 
 	public MultipartBody field(String name, Object value) {
-		MultipartBody body =  new MultipartBody(this).field(name, (value == null) ? "" : value.toString());
+		MultipartBody body =  new MultipartBody(this);
+
+        if(null != value)
+            body.field(name, value.toString());
+
 		this.body = body;
 		return body;
 	}
 	
 	public MultipartBody field(String name, File file) {
-		MultipartBody body =  new MultipartBody(this).field(name, file);
+		MultipartBody body =  new MultipartBody(this);
+
+        if(null != file)
+            body.field(name, file);
+
 		this.body = body;
 		return body;
 	}
@@ -71,10 +79,14 @@ public class HttpRequestWithBody extends HttpRequest {
 		MultipartBody body =  new MultipartBody(this);
 		if (parameters != null) {
 			for(Entry<String, Object> param : parameters.entrySet()) {
-				if (param.getValue() instanceof File) {
-					body.field(param.getKey(), (File)param.getValue());
+                Object value = param.getValue();
+                if(null == value)
+                    continue;
+
+				if (value instanceof File) {
+					body.field(param.getKey(), (File)value);
 				} else {
-					body.field(param.getKey(), (param.getValue() == null) ? "" : param.getValue().toString());
+					body.field(param.getKey(), value.toString());
 				}
 			}
 		}

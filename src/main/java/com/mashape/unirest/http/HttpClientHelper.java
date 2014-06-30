@@ -42,7 +42,6 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.nio.client.HttpAsyncClient;
 
 import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -80,13 +79,12 @@ public class HttpClientHelper {
 	public static <T> Future<HttpResponse<T>> requestAsync(HttpRequest request, final Class<T> responseClass, Callback<T> callback) {
 		HttpUriRequest requestObj = prepareRequest(request);
 
-		CloseableHttpAsyncClient asyncHttpClient = ClientFactory.getAsyncHttpClient();
+        CloseableHttpAsyncClient asyncHttpClient = ClientFactory.getAsyncHttpClient();
 		if (!asyncHttpClient.isRunning()) {
 			asyncHttpClient.start();
 		}
 
-		final Future<org.apache.http.HttpResponse> future = asyncHttpClient.execute(requestObj,
-				prepareCallback(responseClass, callback));
+		final Future<org.apache.http.HttpResponse> future = asyncHttpClient.execute(requestObj, prepareCallback(responseClass, callback));
 
 		return new Future<HttpResponse<T>>() {
 
@@ -125,12 +123,12 @@ public class HttpClientHelper {
 		try {
 			response = client.execute(requestObj);
 			HttpResponse<T> httpResponse = new HttpResponse<T>(response, responseClass);
-			requestObj.releaseConnection();
+			//TODO: requestObj.releaseConnection();
 			return httpResponse;
 		} catch (Exception e) {
 			throw new UnirestException(e);
 		} finally {
-			requestObj.releaseConnection();
+            //TODO: requestObj.releaseConnection();
 		}
 	}
 
@@ -168,7 +166,7 @@ public class HttpClientHelper {
 			break;
 		}
 
-		for (Map.Entry<String, String> entry : request.getHeaders().entrySet()) {
+		for (Entry<String, String> entry : request.getHeaders().entrySet()) {
 			reqObj.addHeader(entry.getKey(), entry.getValue());
 		}
 
