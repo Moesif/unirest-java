@@ -28,25 +28,26 @@ package com.mashape.unirest.http.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 public class MapUtil {
 
-	public static List<NameValuePair> getList(Map<String, Object> parameters) {
+	public static List<NameValuePair> getList(Map<String, List<Object>> parameters) {
 		List<NameValuePair> result = new ArrayList<NameValuePair>();
 		if (parameters != null) {
-
-			Set<String> keySet = parameters.keySet();
-			for (String key : keySet) {
-				Object object = parameters.get(key);
-				if (object != null) {
-					result.add(new BasicNameValuePair(key, object.toString()));
+			for(Entry<String, List<Object>> entry : parameters.entrySet()) {
+				List<Object> entryValue = entry.getValue();
+				if (entryValue != null) {
+					for(Object cur : entryValue) {
+						if (cur != null) {
+							result.add(new BasicNameValuePair(entry.getKey(), cur.toString()));
+						}
+					}
 				}
 			}
-
 		}
 		return result;
 	}

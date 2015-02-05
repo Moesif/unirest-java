@@ -29,11 +29,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 
+import com.mashape.unirest.http.async.utils.AsyncIdleConnectionMonitorThread;
 import com.mashape.unirest.http.options.Option;
 import com.mashape.unirest.http.options.Options;
+import com.mashape.unirest.http.utils.SyncIdleConnectionMonitorThread;
 import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
@@ -47,11 +51,43 @@ public class Unirest {
 	}
 	
 	/**
+	 * Set the asynchronous AbstractHttpAsyncClient implementation to use for every asynchronous request
+	 */
+	public static void setAsyncHttpClient(CloseableHttpAsyncClient asyncHttpClient) {
+		Options.setOption(Option.ASYNCHTTPCLIENT, asyncHttpClient);
+	}
+	
+	/**
+	 * Set a proxy
+	 */
+	public static void setProxy(HttpHost proxy) {
+		Options.setOption(Option.PROXY, proxy);
+		
+		// Reload the client implementations
+		Options.refresh();
+	}
+	
+	/**
 	 * Set the connection timeout and socket timeout
+	 * @param connectionTimeout The timeout until a connection with the server is established (in milliseconds). Default is 10000. Set to zero to disable the timeout.
+	 * @param socketTimeout The timeout to receive data (in milliseconds). Default is 60000. Set to zero to disable the timeout.
 	 */
 	public static void setTimeouts(long connectionTimeout, long socketTimeout) {
 		Options.setOption(Option.CONNECTION_TIMEOUT, connectionTimeout);
 		Options.setOption(Option.SOCKET_TIMEOUT, socketTimeout);
+		
+		// Reload the client implementations
+		Options.refresh();
+	}
+	
+	/**
+	 * Set the concurrency levels
+	 * @param maxTotal Defines the overall connection limit for a connection pool. Default is 200.
+	 * @param maxPerRoute Defines a connection limit per one HTTP route (this can be considered a per target host limit). Default is 20.
+	 */
+	public static void setConcurrency(int maxTotal, int maxPerRoute) {
+		Options.setOption(Option.MAX_TOTAL, maxTotal);
+		Options.setOption(Option.MAX_PER_ROUTE, maxPerRoute);
 		
 		// Reload the client implementations
 		Options.refresh();
@@ -78,22 +114,42 @@ public class Unirest {
 	}
 	
 	/**
-	 * Set the asynchronous AbstractHttpAsyncClient implementation to use for every asynchronous request
-	 */
-	public static void setAsyncHttpClient(CloseableHttpAsyncClient asyncHttpClient) {
-		Options.setOption(Option.ASYNCHTTPCLIENT, asyncHttpClient);
-	}
-	
-	/**
 	 * Close the asynchronous client and its event loop. Use this method to close all the threads and allow an application to exit.  
 	 */
 	public static void shutdown() throws IOException {
+		// Closing the Sync HTTP client
+		CloseableHttpClient syncClient = (CloseableHttpClient) Options.getOption(Option.HTTPCLIENT);
+		if (syncClient != null) {
+			syncClient.close();
+		}
+		
+		SyncIdleConnectionMonitorThread syncIdleConnectionMonitorThread = (SyncIdleConnectionMonitorThread) Options.getOption(Option.SYNC_MONITOR);
+		if (syncIdleConnectionMonitorThread != null) {
+			syncIdleConnectionMonitorThread.interrupt();
+		}
+		
+		// Closing the Async HTTP client (if running)
 		CloseableHttpAsyncClient asyncClient = (CloseableHttpAsyncClient) Options.getOption(Option.ASYNCHTTPCLIENT);
-		if (asyncClient.isRunning()) asyncClient.close();
+		if (asyncClient != null && asyncClient.isRunning()) {
+			asyncClient.close();
+		}
+		
+		AsyncIdleConnectionMonitorThread asyncMonitorThread = (AsyncIdleConnectionMonitorThread) Options.getOption(Option.ASYNC_MONITOR);
+		if (asyncMonitorThread != null) {
+			asyncMonitorThread.interrupt();
+		}
 	}
 	
 	public static GetRequest get(String url) {
 		return new GetRequest(HttpMethod.GET, url);
+	}
+	
+	public static GetRequest head(String url) {
+		return new GetRequest(HttpMethod.HEAD, url);
+	}
+	
+	public static HttpRequestWithBody options(String url) {
+		return new HttpRequestWithBody(HttpMethod.OPTIONS, url);
 	}
 	
 	public static HttpRequestWithBody post(String url) {

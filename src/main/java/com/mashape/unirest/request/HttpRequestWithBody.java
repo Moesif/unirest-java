@@ -26,11 +26,14 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package com.mashape.unirest.request;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.mashape.unirest.http.HttpMethod;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.request.body.MultipartBody;
+import com.mashape.unirest.request.body.RawBody;
 import com.mashape.unirest.request.body.RequestBodyEntity;
 
 public class HttpRequestWithBody extends HttpRequest {
@@ -39,53 +42,63 @@ public class HttpRequestWithBody extends HttpRequest {
 		super(method, url);
 	}
 
+	public HttpRequestWithBody routeParam(String name, String value) {
+		super.routeParam(name, value);
+		return this;
+	}
+
 	@Override
-	public HttpRequestWithBody header(String name, Object value) {
+	public HttpRequestWithBody header(String name, String value) {
 		return (HttpRequestWithBody) super.header(name, value);
 	}
-	
+
 	@Override
-	public HttpRequestWithBody headers(Map<String, Object> headers) {
+	public HttpRequestWithBody headers(Map<String, String> headers) {
 		return (HttpRequestWithBody) super.headers(headers);
 	}
-	
+
+	@Override
 	public HttpRequestWithBody basicAuth(String username, String password) {
 		super.basicAuth(username, password);
 		return this;
 	}
+	
+	@Override
+	public HttpRequestWithBody queryString(Map<String, Object> parameters) {
+		return (HttpRequestWithBody) super.queryString(parameters);
+	}
+	
+	@Override
+	public HttpRequestWithBody queryString(String name, Object value) {
+		return (HttpRequestWithBody) super.queryString(name, value);
+	}
 
+	public MultipartBody field(String name, Collection<?> value) {
+		MultipartBody body = new MultipartBody(this).field(name, value);
+		this.body = body;
+		return body;
+	}
+	
 	public MultipartBody field(String name, Object value) {
-		MultipartBody body =  new MultipartBody(this);
-
-        if(null != value)
-            body.field(name, value.toString());
-
+		MultipartBody body = new MultipartBody(this).field(name, (value == null) ? "" : value.toString());
 		this.body = body;
 		return body;
 	}
-	
+
 	public MultipartBody field(String name, File file) {
-		MultipartBody body =  new MultipartBody(this);
-
-        if(null != file)
-            body.field(name, file);
-
+		MultipartBody body = new MultipartBody(this).field(name, file);
 		this.body = body;
 		return body;
 	}
-	
+
 	public MultipartBody fields(Map<String, Object> parameters) {
 		MultipartBody body =  new MultipartBody(this);
 		if (parameters != null) {
 			for(Entry<String, Object> param : parameters.entrySet()) {
-                Object value = param.getValue();
-                if(null == value)
-                    continue;
-
-				if (value instanceof File) {
-					body.field(param.getKey(), (File)value);
+				if (param.getValue() instanceof File) {
+					body.field(param.getKey(), (File)param.getValue());
 				} else {
-					body.field(param.getKey(), value.toString());
+					body.field(param.getKey(), (param.getValue() == null) ? "" : param.getValue().toString());
 				}
 			}
 		}
@@ -93,10 +106,19 @@ public class HttpRequestWithBody extends HttpRequest {
 		return body;
 	}
 
+	public RequestBodyEntity body(JsonNode body) {
+		return body(body.toString());
+	}
+
 	public RequestBodyEntity body(String body) {
 		RequestBodyEntity b =  new RequestBodyEntity(this).body(body);
 		this.body = b;
 		return b;
 	}
-	
+
+	public RawBody body(byte[] body) {
+		RawBody b = new RawBody(this).body(body);
+		this.body = b;
+		return b;
+	}
 }

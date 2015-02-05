@@ -25,10 +25,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 package com.mashape.unirest.request;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.mashape.unirest.http.HttpMethod;
 
@@ -38,42 +35,22 @@ public class GetRequest extends HttpRequest {
 		super(method, url);
 	}
 
-	public GetRequest field(String name, Object value) {
-        if(null == value)
-            return this;
-
-		StringBuilder queryString  = new StringBuilder();
-		if (this.url.contains("?")) {
-			queryString.append("&");
-		} else {
-			queryString.append("?");
-		}
-		try {
-			queryString.append(name).append("=").append(URLEncoder.encode(value.toString(), "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-		this.url += queryString.toString();
+	public GetRequest routeParam(String name, String value) {
+		super.routeParam(name, value);
 		return this;
 	}
 	
-	public GetRequest fields(Map<String, Object> parameters) {
-		if (parameters != null) {
-			for(Entry<String, Object> param : parameters.entrySet()) {
-                Object value = param.getValue();
-                if(null == value)
-                    continue;
-
-				if (value instanceof String || value instanceof Number || value instanceof Boolean) {
-					field(param.getKey(), value);
-				} else {
-					throw new RuntimeException("Parameter \"" + param.getKey() + "\" can't be sent with a GET request because of type: " + param.getValue().getClass().getName());
-				}
-			}
-		}
-		return this;
+	@Override
+	public GetRequest header(String name, String value) {
+		return (GetRequest) super.header(name, value);
 	}
 	
+	@Override
+	public GetRequest headers(Map<String, String> headers) {
+		return (GetRequest) super.headers(headers);
+	}
+	
+	@Override
 	public GetRequest basicAuth(String username, String password) {
 		super.basicAuth(username, password);
 		return this;
