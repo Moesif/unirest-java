@@ -35,6 +35,7 @@ import java.util.zip.GZIPInputStream;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 
 import com.mashape.unirest.http.utils.ResponseUtils;
@@ -46,7 +47,18 @@ public class HttpResponse<T> {
 	private Headers headers = new Headers();
 	private InputStream rawBody;
 	private T body;
-
+	private HttpRequestBase requestObj;
+	private Boolean pending = false;
+	
+	public Boolean isPending() {
+		return pending;
+	}
+	
+	public HttpResponse(HttpRequestBase requestObj, org.apache.http.HttpResponse response, Class<T> responseClass) {
+		this(response, responseClass);
+		this.requestObj = requestObj;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public HttpResponse(org.apache.http.HttpResponse response, Class<T> responseClass) {
 		HttpEntity responseEntity = response.getEntity();
@@ -75,25 +87,26 @@ public class HttpResponse<T> {
 			}
 		
 			try {
-				byte[] rawBody;
+				InputStream inputStream;
 				try {
 					InputStream responseInputStream = responseEntity.getContent();
 					if (ResponseUtils.isGzipped(responseEntity.getContentEncoding())) {
 						responseInputStream = new GZIPInputStream(responseEntity.getContent());
 					}
-					rawBody = ResponseUtils.getBytes(responseInputStream);
+					inputStream = responseInputStream;
 				} catch (IOException e2) {
 					throw new RuntimeException(e2);
 				}
-				InputStream inputStream = new ByteArrayInputStream(rawBody);
-				this.rawBody = inputStream;
-
-				if (JsonNode.class.equals(responseClass)) {
-					String jsonString = new String(rawBody, charset).trim();
-					this.body = (T) new JsonNode(jsonString);
-				} else if (String.class.equals(responseClass)) {
+				pending = true;
+				
+				if (String.class.equals(responseClass)) {
+					byte[] rawBody = ResponseUtils.getBytes(inputStream);
+					this.rawBody = new ByteArrayInputStream(rawBody);
 					this.body = (T) new String(rawBody, charset);
-				} else if (InputStream.class.equals(responseClass)) {
+					EntityUtils.consume(responseEntity);
+					this.close();
+				} else if (InputStream.class.equals(responseClass)) {					
+					this.rawBody = inputStream;
 					this.body = (T) this.rawBody;
 				} else {
 					throw new Exception("Unknown result type. Only String, JsonNode and InputStream are supported.");
@@ -101,12 +114,6 @@ public class HttpResponse<T> {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-		}
-		
-		try {
-			EntityUtils.consume(responseEntity);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -129,5 +136,17 @@ public class HttpResponse<T> {
 	public T getBody() {
 		return body;
 	}
+	
+	public HttpRequestBase getBaseRequest() {
+		return requestObj;
+	}
 
+	public void close() {
+		if(pending){
+			pending = false;
+			
+			if(requestObj != null)
+				requestObj.releaseConnection();
+		}
+	}
 }

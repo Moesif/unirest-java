@@ -86,7 +86,6 @@ public class HttpClientHelper {
 			public void failed(Exception arg0) {
 				callback.failed(new UnirestException(arg0));
 			}
-
 		};
 	}
 
@@ -146,6 +145,22 @@ public class HttpClientHelper {
 			throw new UnirestException(e);
 		} finally {
 			requestObj.releaseConnection();
+		}
+	}
+	
+	public static <T> HttpResponse<T> requestStream(HttpRequest request, Class<T> responseClass) throws UnirestException {
+		HttpRequestBase requestObj = prepareRequest(request, false);
+		HttpClient client = ClientFactory.getHttpClient(); // The
+															// DefaultHttpClient
+															// is thread-safe
+		
+		org.apache.http.HttpResponse response;
+		try {
+			response = client.execute(requestObj);
+			HttpResponse<T> httpResponse = new HttpResponse<T>(requestObj, response, responseClass);
+			return httpResponse;
+		} catch (Exception e) {
+			throw new UnirestException(e);
 		}
 	}
 

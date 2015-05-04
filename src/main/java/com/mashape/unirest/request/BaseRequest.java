@@ -64,7 +64,7 @@ public abstract class BaseRequest {
 	}
 
 	public HttpResponse<InputStream> asBinary() throws UnirestException {
-		return HttpClientHelper.request(httpRequest, InputStream.class);
+		return HttpClientHelper.requestStream(httpRequest, InputStream.class);
 	}
 
 	public Future<HttpResponse<InputStream>> asBinaryAsync() {
