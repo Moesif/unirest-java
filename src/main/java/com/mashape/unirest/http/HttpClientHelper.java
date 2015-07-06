@@ -93,6 +93,7 @@ public class HttpClientHelper {
 		HttpUriRequest requestObj = prepareRequest(request, true);
 
 		CloseableHttpAsyncClient asyncHttpClient = ClientFactory.getAsyncHttpClient();
+
 		if (!asyncHttpClient.isRunning()) {
 			asyncHttpClient.start();
 			AsyncIdleConnectionMonitorThread asyncIdleConnectionMonitorThread = (AsyncIdleConnectionMonitorThread) Options.getOption(Option.ASYNC_MONITOR);
@@ -224,7 +225,7 @@ public class HttpClientHelper {
 			reqObj = new HttpHead(urlToRequest);
 			break;
 		}
-		
+		        
 		Set<Entry<String, List<String>>> entrySet = request.getHeaders().entrySet();
 		for(Entry<String, List<String>> entry : entrySet) {
 			List<String> values = entry.getValue();

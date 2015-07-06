@@ -48,6 +48,7 @@ public class HttpResponse<T> {
 	private InputStream rawBody;
 	private T body;
 	private HttpRequestBase requestObj;
+	private InputStream inputStream;
 	private Boolean pending = false;
 	
 	public Boolean isPending() {
@@ -86,8 +87,7 @@ public class HttpResponse<T> {
 				}
 			}
 		
-			try {
-				InputStream inputStream;
+			try {				
 				try {
 					InputStream responseInputStream = responseEntity.getContent();
 					if (ResponseUtils.isGzipped(responseEntity.getContentEncoding())) {
@@ -104,6 +104,7 @@ public class HttpResponse<T> {
 					this.rawBody = new ByteArrayInputStream(rawBody);
 					this.body = (T) new String(rawBody, charset);
 					EntityUtils.consume(responseEntity);
+					inputStream.close();
 					this.close();
 				} else if (InputStream.class.equals(responseClass)) {					
 					this.rawBody = inputStream;
@@ -143,10 +144,17 @@ public class HttpResponse<T> {
 
 	public void close() {
 		if(pending){
-			pending = false;
-			
-			if(requestObj != null)
-				requestObj.releaseConnection();
-		}
+			try{
+				if(inputStream != null)
+					inputStream.close();				
+			} catch(IOException ex) {
+				//do nothing
+			}
+			finally{
+				if(requestObj != null)
+					requestObj.releaseConnection();
+				pending = false;
+			}
+		}		
 	}
 }

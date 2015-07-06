@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpHost;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -50,6 +51,10 @@ public class Options {
 		Object maxPerRoute = Options.getOption(Option.MAX_PER_ROUTE);
 		if (maxPerRoute == null) maxPerRoute = MAX_PER_ROUTE;
 		
+		//load cookie spec
+		Object cookieSpec = Options.getOption(Option.COOKIE_SPEC);
+		if (cookieSpec == null) cookieSpec = CookieSpecs.STANDARD;
+		
 		// Load proxy if set
 		HttpHost proxy = (HttpHost) Options.getOption(Option.PROXY);
 		
@@ -59,8 +64,9 @@ public class Options {
 				.setSocketTimeout(((Long) socketTimeout).intValue())
 				.setConnectionRequestTimeout(((Long)socketTimeout).intValue())
 				.setProxy(proxy)
-				.build();
-	
+				.setCookieSpec((String) cookieSpec)
+				.build();	
+		
 		PoolingHttpClientConnectionManager syncConnectionManager = new PoolingHttpClientConnectionManager();
 		syncConnectionManager.setMaxTotal((Integer) maxTotal);
 		syncConnectionManager.setDefaultMaxPerRoute((Integer) maxPerRoute);
