@@ -7,6 +7,7 @@
     <packaging>jar</packaging>
 
     <name>unirest-java</name>
+    <description>Fork of Unirest client</description>
     <url>http://maven.apache.org</url>
     <licenses>
         <license>
@@ -15,10 +16,23 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
     <scm>
         <url>https://github.com/Moesif/unirest-java.git</url>
     </scm>
+    <developers>
+        <developer>
+            <id>moesif</id>
+            <name>Moesif</name>
+            <email>support@moesif.com</email>
+            <url>https://www.moesif.com</url>
+            <organization>Moesif, Inc.</organization>
+            <organizationUrl>http://www.moesif.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>America/Los_Angeles</timezone>
+        </developer>
+    </developers>
     <build>
         <plugins>
             <plugin>
@@ -164,7 +178,7 @@
         <repository>
             <id>bintray-moesif-maven</id>
             <name>moesif-maven</name>
-            <url>https://api.bintray.com/maven/moesif/maven/unirest-java/;publish=1</url>
+            <url>https://api.bintray.com/maven/moesif/maven/unirest-java/;publish=1;override=1</url>
         </repository>
     </distributionManagement>
 </project>
