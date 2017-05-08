@@ -178,7 +178,7 @@
         <repository>
             <id>bintray-moesif-maven</id>
             <name>moesif-maven</name>
-            <url>https://api.bintray.com/maven/moesif/maven/unirest-java/;publish=1;override=1</url>
+            <url>https://api.bintray.com/maven/moesif/maven/unirest-java/;publish=1</url>
         </repository>
     </distributionManagement>
 </project>
