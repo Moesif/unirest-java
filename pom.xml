@@ -1,16 +1,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.mashape.unirest</groupId>
-  <artifactId>unirest-java</artifactId>
-  <version>1.0.2</version>
-  <packaging>jar</packaging>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.moesif.unirest</groupId>
+    <artifactId>unirest-java</artifactId>
+    <version>1.0.2</version>
+    <packaging>jar</packaging>
 
-  <name>unirest-java</name>
-  <url>http://maven.apache.org</url>
-  <build>
-  <plugins>
-  <plugin>
+    <name>unirest-java</name>
+    <url>http://maven.apache.org</url>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/Moesif/unirest-java.git</url>
+    </scm>
+    <build>
+        <plugins>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.2</version>
@@ -21,10 +32,11 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>${project.artifactId}-${project.version}-withDependency-ShadedForAndroid</finalName>
+                            <finalName>${project.artifactId}-${project.version}-withDependency-ShadedForAndroid
+                            </finalName>
                             <artifactSet>
                                 <includes>
-                                    <include>com.mashape.unirest:unirest-java</include>
+                                    <include>com.moesif.unirest:unirest-java</include>
                                     <include>org.apache.httpcomponents:httpclient</include>
                                     <include>org.apache.httpcomponents:httpcore</include>
                                     <include>org.apache.httpcomponents:httpcore-nio</include>
@@ -38,7 +50,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>org.apache.http</pattern>
-                                    <shadedPattern>com.mashape.relocation</shadedPattern>
+                                    <shadedPattern>com.moesif.relocation</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -46,64 +58,113 @@
                 </executions>
             </plugin>
             <!-- download source code in Eclipse, best practice -->
-		  <plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-eclipse-plugin</artifactId>
-			<version>2.9</version>
-			<configuration>
-				<downloadSources>true</downloadSources>
-				<downloadJavadocs>false</downloadJavadocs>
-			</configuration>
-		  </plugin>
- 
-		  <!-- Set a compiler level -->
-		  <plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-compiler-plugin</artifactId>
-			<version>2.3.2</version>
-			<configuration>
-				<source>${jdk.version}</source>
-				<target>${jdk.version}</target>
-			</configuration>
-		  </plugin>
- 
-		  <!-- Make this jar executable -->
-		  <plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-jar-plugin</artifactId>
-			<configuration>
-			   <archive>
-			     <manifest>
-				<mainClass>com.mkyong.core.utils.App</mainClass>
-			     </manifest>
-			   </archive>
-			</configuration>
-		  </plugin>
-		  </plugins>
-  </build>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <dependencies>
-  	<dependency>
-  		<groupId>org.apache.httpcomponents</groupId>
-  		<artifactId>httpclient</artifactId>
-  		<version>4.3.4</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.apache.httpcomponents</groupId>
-  		<artifactId>httpasyncclient</artifactId>
-  		<version>4.0.1</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.apache.httpcomponents</groupId>
-  		<artifactId>httpmime</artifactId>
-  		<version>4.3.4</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.json</groupId>
-  		<artifactId>json</artifactId>
-  		<version>20090211</version>
-  	</dependency>
-  </dependencies>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <downloadJavadocs>false</downloadJavadocs>
+                </configuration>
+            </plugin>
+
+            <!-- Set a compiler level -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Make this jar executable -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.mkyong.core.utils.App</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpasyncclient</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20090211</version>
+        </dependency>
+    </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-moesif-maven</id>
+            <name>moesif-maven</name>
+            <url>https://api.bintray.com/maven/moesif/maven/unirest-java/;publish=1</url>
+        </repository>
+    </distributionManagement>
 </project>
