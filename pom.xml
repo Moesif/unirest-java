@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.moesif.unirest</groupId>
     <artifactId>unirest-java</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.5</version>
     <packaging>jar</packaging>
 
     <name>unirest-java</name>
@@ -86,10 +86,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.8.1</version>
                 <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
 
@@ -135,7 +135,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -146,7 +146,22 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.6</version>
+                <extensions>false</extensions>
+                <executions>
+                    <execution>
+                        <id>injected-nexus-deploy</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+               </configuration>
+              </plugin>
+          </plugins>
     </build>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -174,11 +189,4 @@
         </dependency>
     </dependencies>
 
-    <distributionManagement>
-        <repository>
-            <id>bintray-moesif-maven</id>
-            <name>moesif-maven</name>
-            <url>https://api.bintray.com/maven/moesif/maven/unirest-java/;publish=1</url>
-        </repository>
-    </distributionManagement>
 </project>
