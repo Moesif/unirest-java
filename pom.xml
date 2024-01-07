@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.moesif.unirest</groupId>
     <artifactId>unirest-java</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.8-2</version>
     <packaging>jar</packaging>
 
     <name>unirest-java</name>

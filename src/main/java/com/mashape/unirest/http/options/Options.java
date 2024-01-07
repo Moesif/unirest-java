@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpHost;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
@@ -23,6 +25,7 @@ public class Options {
 	private static final long SOCKET_TIMEOUT = 60000;
 	public static final int MAX_TOTAL = 200;
 	public static final int MAX_PER_ROUTE = 20;
+	public static final HttpRequestRetryHandler HTTP_REQUEST_RETRY_HANDLER = new DefaultHttpRequestRetryHandler(3, true);
 	
 	private static Map<Option, Object> options = new HashMap<Option, Object>();
 	
@@ -70,9 +73,21 @@ public class Options {
 		PoolingHttpClientConnectionManager syncConnectionManager = new PoolingHttpClientConnectionManager();
 		syncConnectionManager.setMaxTotal((Integer) maxTotal);
 		syncConnectionManager.setDefaultMaxPerRoute((Integer) maxPerRoute);
-		
+
+		// Load retry handler if set
+		HttpRequestRetryHandler httpRequestRetryHandler = (HttpRequestRetryHandler) Options.getOption(Option.HTTP_REQUEST_RETRY_HANDLER);
+
+		// Create http client builder
+		HttpClientBuilder httpClientBuilder = HttpClientBuilder
+				.create()
+				.setDefaultRequestConfig(clientConfig)
+				.setConnectionManager(syncConnectionManager)
+				.setRetryHandler(httpRequestRetryHandler);
+		if (httpRequestRetryHandler != null) {
+			httpClientBuilder.setRetryHandler(httpRequestRetryHandler);
+		}
 		// Create clients
-		setOption(Option.HTTPCLIENT, HttpClientBuilder.create().setDefaultRequestConfig(clientConfig).setConnectionManager(syncConnectionManager).build());
+		setOption(Option.HTTPCLIENT, httpClientBuilder.build());
 		SyncIdleConnectionMonitorThread syncIdleConnectionMonitorThread = new SyncIdleConnectionMonitorThread(syncConnectionManager);
 		setOption(Option.SYNC_MONITOR, syncIdleConnectionMonitorThread);
 		syncIdleConnectionMonitorThread.start();
@@ -88,7 +103,11 @@ public class Options {
 			throw new RuntimeException(e);
 		}
 		
-		CloseableHttpAsyncClient asyncClient = HttpAsyncClientBuilder.create().setDefaultRequestConfig(clientConfig).setConnectionManager(asyncConnectionManager).build();
+		CloseableHttpAsyncClient asyncClient = HttpAsyncClientBuilder
+				.create()
+				.setDefaultRequestConfig(clientConfig)
+				.setConnectionManager(asyncConnectionManager)
+				.build();
 		setOption(Option.ASYNCHTTPCLIENT, asyncClient);
 		setOption(Option.ASYNC_MONITOR, new AsyncIdleConnectionMonitorThread(asyncConnectionManager));
 	}
