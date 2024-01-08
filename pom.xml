@@ -86,7 +86,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.10.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -123,7 +123,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
+                <version>3.4.1</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -146,13 +146,20 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
+                        <configuration>
+                            <!-- This is necessary for gpg to not try to use the pinentry programs -->
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.6</version>
+                <version>1.6.13</version>
                 <extensions>false</extensions>
                 <executions>
                     <execution>
@@ -162,8 +169,8 @@
                 </executions>
                 <configuration>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
-               </configuration>
-              </plugin>
+                </configuration>
+            </plugin>
           </plugins>
     </build>
     <properties>
