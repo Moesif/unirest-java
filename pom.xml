@@ -92,20 +92,6 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-
-            <!-- Make this jar executable -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.mkyong.core.utils.App</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -113,7 +99,6 @@
                 <executions>
                     <execution>
                         <id>attach-sources</id>
-                        <phase>install</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
