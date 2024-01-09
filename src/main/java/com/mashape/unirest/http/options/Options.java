@@ -26,7 +26,7 @@ public class Options {
 	public static final int MAX_TOTAL = 200;
 	public static final int MAX_PER_ROUTE = 20;
 	public static final HttpRequestRetryHandler HTTP_REQUEST_RETRY_HANDLER = new DefaultHttpRequestRetryHandler(3, true);
-
+	
 	private static Map<Option, Object> options = new HashMap<Option, Object>();
 	
 	public static void setOption(Option option, Object value) {
@@ -74,11 +74,8 @@ public class Options {
 		syncConnectionManager.setMaxTotal((Integer) maxTotal);
 		syncConnectionManager.setDefaultMaxPerRoute((Integer) maxPerRoute);
 
-		// Get retry handler if set
+		// Load retry handler if set
 		HttpRequestRetryHandler httpRequestRetryHandler = (HttpRequestRetryHandler) Options.getOption(Option.HTTP_REQUEST_RETRY_HANDLER);
-		if (httpRequestRetryHandler == null) {
-			httpRequestRetryHandler = Options.HTTP_REQUEST_RETRY_HANDLER;
-		}
 
 		// Create http client builder
 		HttpClientBuilder httpClientBuilder = HttpClientBuilder
@@ -86,10 +83,11 @@ public class Options {
 				.setDefaultRequestConfig(clientConfig)
 				.setConnectionManager(syncConnectionManager)
 				.setRetryHandler(httpRequestRetryHandler);
-
+		if (httpRequestRetryHandler != null) {
+			httpClientBuilder.setRetryHandler(httpRequestRetryHandler);
+		}
 		// Create clients
 		setOption(Option.HTTPCLIENT, httpClientBuilder.build());
-
 		SyncIdleConnectionMonitorThread syncIdleConnectionMonitorThread = new SyncIdleConnectionMonitorThread(syncConnectionManager);
 		setOption(Option.SYNC_MONITOR, syncIdleConnectionMonitorThread);
 		syncIdleConnectionMonitorThread.start();
