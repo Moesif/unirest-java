@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.moesif.unirest</groupId>
     <artifactId>unirest-java</artifactId>
-    <version>1.0.9</version>
+    <version>1.0.10</version>
     <packaging>jar</packaging>
 
     <name>unirest-java</name>
@@ -117,17 +117,17 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
+            <version>4.5.14</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpasyncclient</artifactId>
-            <version>4.0.2</version>
+            <version>4.1.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>4.3.4</version>
+            <version>4.5.14</version>
         </dependency>
     </dependencies>
 
